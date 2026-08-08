@@ -71,7 +71,16 @@ const crsCatalog = [
 let sourceCrs, targetCrs, form, formMessage, libraryDot, libraryStatus, appVersionEl, themeToggleButton;
 let xInput, yInput, zInput, precisionInput, xResult, yResult, pairResult, crsInfo;
 
-const APP_VERSION = 'v1.1';
+const APP_VERSION = 'v1.3.4';
+
+// Make the version visible early: app.js is loaded with defer so DOM is parsed
+// and the #appVersion element exists — set its text content immediately as a fallback
+if (typeof document !== 'undefined') {
+  try {
+    const earlyAppVersionEl = document.querySelector && document.querySelector('#appVersion');
+    if (earlyAppVersionEl) earlyAppVersionEl.textContent = APP_VERSION;
+  } catch (e) { /* ignore */ }
+}
 
 function getStoredTheme() {
   try {
@@ -148,13 +157,13 @@ function initialize() {
 
   renderCrsOptions();
   if (!window.proj4) {
-    libraryStatus.textContent = "Proj4js no cargo";
+    if (libraryStatus) libraryStatus.textContent = "Proj4js no cargo";
     message(formMessage, "No se pudo cargar Proj4js. Verifica que proj4.js este en la misma carpeta que index.html.", "error");
     return;
   }
   crsCatalog.forEach(addDefinition);
-  libraryDot.classList.add("ready");
-  libraryStatus.textContent = "Proj4js listo";
+  if (libraryDot) libraryDot.classList.add("ready");
+  if (libraryStatus) libraryStatus.textContent = "Proj4js listo";
   message(formMessage, "Listo para convertir.", "success");
   renderCrsInfo();
   if (appVersionEl) appVersionEl.textContent = APP_VERSION;
