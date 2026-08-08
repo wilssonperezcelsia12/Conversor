@@ -242,3 +242,16 @@ document.querySelector("#reuseButton").addEventListener("click", () => {
 sourceCrs.addEventListener("change", renderCrsInfo);
 targetCrs.addEventListener("change", renderCrsInfo);
 window.addEventListener("load", initialize);
+
+// Register a service worker to enable offline usage (PWA)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then((reg) => {
+        console.log('Service worker registered.', reg);
+      })
+      .catch((err) => {
+        console.warn('Service worker registration failed:', err);
+      });
+  });
+}
