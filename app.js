@@ -73,6 +73,8 @@ const form = document.querySelector("#converterForm");
 const formMessage = document.querySelector("#formMessage");
 const libraryDot = document.querySelector("#libraryDot");
 const libraryStatus = document.querySelector("#libraryStatus");
+const appVersionEl = document.querySelector('#appVersion');
+const APP_VERSION = 'v1.1';
 const xInput = document.querySelector("#xInput");
 const yInput = document.querySelector("#yInput");
 const zInput = document.querySelector("#zInput");
@@ -184,6 +186,7 @@ function initialize() {
   libraryStatus.textContent = "Proj4js listo";
   message(formMessage, "Listo para convertir.", "success");
   renderCrsInfo();
+  if (appVersionEl) appVersionEl.textContent = APP_VERSION;
 }
 
 form.addEventListener("submit", (event) => {
@@ -248,6 +251,14 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then((reg) => {
       console.log('Service worker registered.', reg);
+
+      // Immediately check for an update on load (safe if offline)
+      try {
+        reg.update();
+      } catch (err) {
+        // update may fail offline; ignore
+      }
+
       // If there's an updated worker already waiting, prompt the user
       if (reg.waiting) {
         promptUserToRefresh(reg);
@@ -266,6 +277,12 @@ if ('serviceWorker' in navigator) {
           }
         });
       });
+
+      // Also check when the app regains connectivity
+      window.addEventListener('online', () => {
+        try { reg.update(); } catch (e) {}
+      });
+
     }).catch((err) => {
       console.warn('Service worker registration failed:', err);
     });

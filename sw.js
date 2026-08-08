@@ -1,4 +1,5 @@
-const CACHE_NAME = 'conversor-epsg-v1.1';
+const VERSION = 'v1.2';
+const CACHE_NAME = `conversor-epsg-${VERSION}`;
 const ASSETS = [
   '.',
   'index.html',
