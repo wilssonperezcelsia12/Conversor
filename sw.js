@@ -19,17 +19,11 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((key) => {
-        if (key !== CACHE_NAME) return caches.delete(key);
-      }))
-    )
+    caches.keys().then((keys) => {
+      const deletions = keys.map((key) => (key !== CACHE_NAME ? caches.delete(key) : Promise.resolve()));
+      return Promise.all(deletions).then(() => self.clients.claim());
+    })
   );
-});
-
-// Take control of the clients as soon as this SW becomes active
-self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
 });
 
 // Listen for messages from the page (e.g., skipWaiting)

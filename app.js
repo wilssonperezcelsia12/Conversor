@@ -75,6 +75,20 @@ const libraryDot = document.querySelector("#libraryDot");
 const libraryStatus = document.querySelector("#libraryStatus");
 const appVersionEl = document.querySelector('#appVersion');
 const APP_VERSION = 'v1.1';
+
+// Try to read VERSION from sw.js so sw.js remains the single source of truth
+async function fetchVersionFromServiceWorkerFile() {
+  try {
+    const res = await fetch('sw.js?__ts=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('No se pudo descargar sw.js');
+    const text = await res.text();
+    const m = text.match(/const\s+VERSION\s*=\s*['\"]([^'\"]+)['\"]/);
+    if (m && m[1]) return m[1];
+  } catch (e) {
+    // ignore and fallback
+  }
+  return null;
+}
 const xInput = document.querySelector("#xInput");
 const yInput = document.querySelector("#yInput");
 const zInput = document.querySelector("#zInput");
@@ -187,6 +201,9 @@ function initialize() {
   message(formMessage, "Listo para convertir.", "success");
   renderCrsInfo();
   if (appVersionEl) appVersionEl.textContent = APP_VERSION;
+  fetchVersionFromServiceWorkerFile().then((v) => {
+    if (v && appVersionEl) appVersionEl.textContent = v;
+  });
 }
 
 form.addEventListener("submit", (event) => {
