@@ -1,5 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 24 24" fill="none">
-  <rect width="24" height="24" rx="4" fill="#087f8c"/>
-  <path d="M6 15.5V9.5l6-4 6 4v6" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M9 11.5h6v4" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="259" height="267" viewBox="0 0 259 267">
+  <title>Ubicación sobre ejes coordenados</title>
+  <desc>Icono vectorial con ejes cartesianos, marcador de ubicación y líneas de referencia punteadas.</desc>
+
+  <!-- Ejes -->
+  <g fill="none" stroke="#5BB0F2" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Eje vertical -->
+    <path d="M30 250 V11"/>
+    <path d="M30 11 L17 24"/>
+    <path d="M30 11 L43 24"/>
+
+    <!-- Eje horizontal -->
+    <path d="M10 228 H249"/>
+    <path d="M249 228 L237 216"/>
+    <path d="M249 228 L237 240"/>
+
+    <!-- Marcas -->
+    <path d="M30 81 H12"/>
+    <path d="M30 155 H12"/>
+    <path d="M106 228 V248"/>
+    <path d="M178 228 V248"/>
+  </g>
+
+  <!-- Líneas de referencia -->
+  <g fill="none" stroke="#18BDAF" stroke-width="7" stroke-linecap="round" stroke-dasharray="9 20">
+    <path d="M50 168 H130"/>
+    <path d="M130 182 V224"/>
+  </g>
+
+  <!-- Marcador -->
+  <path fill="#FDBB2D" d="
+    M135 28
+    C106 28 83 50 83 79
+    C83 109 105 136 130 163
+    C132 165 134 166 135 163
+    C160 136 187 109 187 79
+    C187 50 164 28 135 28 Z"/>
+
+  <!-- Centro del marcador -->
+  <circle cx="135" cy="80" r="31" fill="#F7F7F7"/>
 </svg>
