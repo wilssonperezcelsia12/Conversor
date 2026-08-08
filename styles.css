@@ -1,3 +1,8 @@
+/* ==========================================================================
+   1. VARIABLES DE ENTORNO Y TEMAS (Light/Dark)
+   ========================================================================== */
+
+/* Variables para el tema claro (por defecto) */
 :root {
   color-scheme: light;
   --ink: #20252d;
@@ -17,8 +22,8 @@
   --code-border: #e4e7ec;
   --error-bg: #fff4f2;
   --success-bg: #f0fdf4;
-  --accent: #0cba38;
-  --accent-strong: #070e73;
+  --accent: #de0b5c;
+  --accent-strong: #700723;
   --accent-soft: #dff5f7;
 
   --warn: #a04100;
@@ -28,6 +33,7 @@
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+/* Variables para el tema oscuro */
 html[data-theme='dark'] {
   color-scheme: dark;
   --ink: #f8fafc;
@@ -48,7 +54,6 @@ html[data-theme='dark'] {
   --error-bg: rgba(248, 113, 113, 0.12);
   --success-bg: rgba(74, 222, 128, 0.12);
   --accent: #38bdf8;
-
   --accent-strong: #0ea5e9;
   --accent-soft: rgba(56, 189, 248, 0.12);
   --warn: #fca5a5;
@@ -57,6 +62,9 @@ html[data-theme='dark'] {
   --shadow: 0 18px 36px rgba(0, 0, 0, 0.30);
 }
 
+/* ==========================================================================
+   2. RESET Y ESTILOS BASE
+   ========================================================================== */
 * {
   box-sizing: border-box;
 }
@@ -84,12 +92,16 @@ select {
   font: inherit;
 }
 
+/* ==========================================================================
+   3. ESTRUCTURA PRINCIPAL (SHELL)
+   ========================================================================== */
 .shell {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding: 28px 0 36px;
 }
 
+/* Encabezado principal */
 header {
   display: flex;
   align-items: flex-end;
@@ -113,6 +125,7 @@ h1 {
   line-height: 1.5;
 }
 
+/* Indicador de estado de la librería */
 .status-pill {
   flex: 0 0 auto;
   display: inline-flex;
@@ -142,6 +155,9 @@ html[data-theme='dark'] .status-pill {
   background: var(--good);
 }
 
+/* ==========================================================================
+   4. LAYOUT DE GRILLA Y PANELES
+   ========================================================================== */
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(330px, 0.95fr);
@@ -159,6 +175,7 @@ html[data-theme='dark'] .status-pill {
   min-width: 140px;
 }
 
+/* Estilos para los paneles contenedores */
 .panel {
   background: var(--panel);
   border: 1px solid var(--panel-border);
@@ -189,6 +206,9 @@ html[data-theme='dark'] .status-pill {
   padding: 20px;
 }
 
+/* ==========================================================================
+   5. ELEMENTOS DE FORMULARIO E INPUTS
+   ========================================================================== */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -226,6 +246,7 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(8, 127, 140, 0.14);
 }
 
+/* Botones y acciones del formulario */
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -272,6 +293,9 @@ select:focus {
   background: var(--button-secondary-hover);
 }
 
+/* ==========================================================================
+   6. VISUALIZACIÓN DE RESULTADOS
+   ========================================================================== */
 .result-box {
   display: grid;
   gap: 12px;
@@ -302,6 +326,7 @@ select:focus {
   overflow-wrap: anywhere;
 }
 
+/* Mensajes de notificación (éxito/error) */
 .message {
   margin-top: 14px;
   border-radius: 8px;
@@ -341,6 +366,9 @@ select:focus {
   padding: 1px 5px;
 }
 
+/* ==========================================================================
+   7. DISEÑO RESPONSIVO (MEDIA QUERIES)
+   ========================================================================== */
 @media (max-width: 860px) {
   header {
     align-items: flex-start;
