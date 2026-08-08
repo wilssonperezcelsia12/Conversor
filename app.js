@@ -246,12 +246,90 @@ window.addEventListener("load", initialize);
 // Register a service worker to enable offline usage (PWA)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then((reg) => {
-        console.log('Service worker registered.', reg);
-      })
-      .catch((err) => {
-        console.warn('Service worker registration failed:', err);
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+      console.log('Service worker registered.', reg);
+      // If there's an updated worker already waiting, prompt the user
+      if (reg.waiting) {
+        promptUserToRefresh(reg);
+      }
+
+      // Listen for new installing workers
+      reg.addEventListener('updatefound', () => {
+        const installing = reg.installing;
+        if (!installing) return;
+        installing.addEventListener('statechange', () => {
+          if (installing.state === 'installed') {
+            // A new service worker is installed and waiting if there's a controller
+            if (navigator.serviceWorker.controller) {
+              promptUserToRefresh(reg);
+            }
+          }
+        });
       });
+    }).catch((err) => {
+      console.warn('Service worker registration failed:', err);
+    });
+
+    // Reload the page when the new service worker activates
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
   });
+}
+
+function promptUserToRefresh(registration) {
+  // Create a simple banner if it doesn't exist
+  if (document.querySelector('.update-banner')) return;
+
+  const banner = document.createElement('div');
+  banner.className = 'update-banner';
+  banner.style.position = 'fixed';
+  banner.style.left = '12px';
+  banner.style.right = '12px';
+  banner.style.bottom = '18px';
+  banner.style.zIndex = '9999';
+  banner.style.display = 'flex';
+  banner.style.gap = '10px';
+  banner.style.alignItems = 'center';
+  banner.style.justifyContent = 'space-between';
+  banner.style.padding = '12px 14px';
+  banner.style.borderRadius = '8px';
+  banner.style.boxShadow = '0 6px 24px rgba(16,24,40,0.12)';
+  banner.style.background = '#fff';
+
+  const text = document.createElement('div');
+  text.textContent = 'Hay una nueva versión de la app. Actualiza para ver los cambios.';
+  text.style.color = 'var(--ink)';
+
+  const actions = document.createElement('div');
+
+  const updateBtn = document.createElement('button');
+  updateBtn.className = 'btn btn-primary';
+  updateBtn.textContent = 'Actualizar';
+  updateBtn.addEventListener('click', () => {
+    // Tell the waiting service worker to skipWaiting
+    if (!registration || !registration.waiting) return;
+    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+  });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'btn btn-secondary';
+  closeBtn.textContent = 'Cerrar';
+  closeBtn.addEventListener('click', () => {
+    banner.remove();
+  });
+
+  actions.appendChild(updateBtn);
+  actions.appendChild(closeBtn);
+  banner.appendChild(text);
+  banner.appendChild(actions);
+  document.body.appendChild(banner);
+
+  // Remove banner after 2 minutes to avoid lingering UI
+  setTimeout(() => {
+    banner.remove();
+  }, 120000);
 }

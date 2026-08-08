@@ -26,6 +26,19 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Take control of the clients as soon as this SW becomes active
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
+// Listen for messages from the page (e.g., skipWaiting)
+self.addEventListener('message', (event) => {
+  if (!event.data) return;
+  if (event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   // Only handle GET requests
