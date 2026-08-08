@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conversor de coordenadas EPSG</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.12.1/proj4.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>Conversor de coordenadas EPSG</h1>
+        <p class="subtitle">Ingresa un punto, selecciona el sistema de coordenadas origen y destino, y convierte con Proj4js. Los valores se manejan como X/Y: longitud/latitud para geogr&aacute;ficas y este/norte para proyectadas.</p>
+      </div>
+      <div class="status-pill" aria-live="polite">
+        <span id="libraryDot" class="dot"></span>
+        <span id="libraryStatus">Cargando Proj4js</span>
+      </div>
+    </header>
+
+    <section class="grid">
+      <form id="converterForm" class="panel">
+        <div class="panel-head">
+          <h2>Conversi&oacute;n</h2>
+          <p>Usa punto decimal. Para EPSG:4326 escribe X = longitud y Y = latitud.</p>
+        </div>
+        <div class="panel-body">
+          <div class="form-grid">
+            <div class="field">
+              <label for="sourceCrs">EPSG origen</label>
+              <select id="sourceCrs" required></select>
+            </div>
+            <div class="field">
+              <label for="targetCrs">EPSG destino</label>
+              <select id="targetCrs" required></select>
+            </div>
+            <div class="field">
+              <label for="xInput">X / Este / Longitud</label>
+              <input id="xInput" type="number" step="any" inputmode="decimal" placeholder="-74.0721" required>
+            </div>
+            <div class="field">
+              <label for="yInput">Y / Norte / Latitud</label>
+              <input id="yInput" type="number" step="any" inputmode="decimal" placeholder="4.7110" required>
+            </div>
+            <div class="field">
+              <label for="precisionInput">Decimales</label>
+              <input id="precisionInput" type="number" min="0" max="12" step="1" value="6">
+            </div>
+            <div class="field">
+              <label for="zInput">Z opcional</label>
+              <input id="zInput" type="number" step="any" inputmode="decimal" placeholder="Altura">
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" type="submit">Convertir</button>
+            <button id="swapButton" class="btn btn-secondary" type="button">Intercambiar EPSG</button>
+            <button id="clearButton" class="btn btn-secondary" type="button">Limpiar</button>
+          </div>
+          <div id="formMessage" class="message">Listo para convertir cuando Proj4js termine de cargar.</div>
+        </div>
+      </form>
+
+      <aside class="panel">
+        <div class="panel-head">
+          <h2>Resultado</h2>
+          <p>El resultado queda disponible para copiar y reutilizar en otra conversi&oacute;n.</p>
+        </div>
+        <div class="panel-body">
+          <div class="result-box">
+            <div class="metric">
+              <span>X resultado</span>
+              <strong id="xResult">-</strong>
+            </div>
+            <div class="metric">
+              <span>Y resultado</span>
+              <strong id="yResult">-</strong>
+            </div>
+            <div class="metric">
+              <span>Coordenada</span>
+              <strong id="pairResult">-</strong>
+            </div>
+          </div>
+          <div class="actions">
+            <button id="copyButton" class="btn btn-secondary" type="button">Copiar resultado</button>
+            <button id="reuseButton" class="btn btn-secondary" type="button">Usar como origen</button>
+          </div>
+          <div class="crs-list" id="crsInfo"></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel custom-panel">
+      <div class="panel-head">
+        <h2>Agregar otro EPSG</h2>
+        <p>Si el navegador tiene internet, el aplicativo puede cargar definiciones desde epsg.io. Tambi&eacute;n puedes pegar una cadena Proj4 manualmente.</p>
+      </div>
+      <div class="panel-body">
+        <div class="form-grid">
+          <div class="field">
+            <label for="customCode">C&oacute;digo EPSG</label>
+            <input id="customCode" type="text" inputmode="numeric" placeholder="Ej. 3116">
+          </div>
+          <div class="field">
+            <label for="customName">Nombre visible</label>
+            <input id="customName" type="text" placeholder="Ej. MAGNA-SIRGAS / Colombia Bogot&aacute;">
+          </div>
+          <div class="wide-field">
+            <label for="customProj4">Definici&oacute;n Proj4 opcional</label>
+            <textarea id="customProj4" placeholder="+proj=tmerc +lat_0=4 ... +units=m +no_defs"></textarea>
+            <span class="hint">Si no pegas una definici&oacute;n, se intentar&aacute; cargar autom&aacute;ticamente desde https://epsg.io/{codigo}.js.</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="addCrsButton" class="btn btn-primary" type="button">Agregar EPSG</button>
+        </div>
+        <div id="customMessage" class="message">Los EPSG agregados aparecer&aacute;n en los dos selectores.</div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
