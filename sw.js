@@ -1,4 +1,4 @@
-const VERSION = 'v1.2';
+const VERSION = 'v1.3';
 const CACHE_NAME = `conversor-epsg-${VERSION}`;
 const ASSETS = [
   '.',
