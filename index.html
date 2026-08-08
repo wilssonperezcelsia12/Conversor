@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Conversor de coordenadas EPSG</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.12.1/proj4.js"></script>
+  <script src="proj4.js"></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -91,34 +91,6 @@
           <div class="crs-list" id="crsInfo"></div>
         </div>
       </aside>
-    </section>
-
-    <section class="panel custom-panel">
-      <div class="panel-head">
-        <h2>Agregar otro EPSG</h2>
-        <p>Si el navegador tiene internet, el aplicativo puede cargar definiciones desde epsg.io. Tambi&eacute;n puedes pegar una cadena Proj4 manualmente.</p>
-      </div>
-      <div class="panel-body">
-        <div class="form-grid">
-          <div class="field">
-            <label for="customCode">C&oacute;digo EPSG</label>
-            <input id="customCode" type="text" inputmode="numeric" placeholder="Ej. 3116">
-          </div>
-          <div class="field">
-            <label for="customName">Nombre visible</label>
-            <input id="customName" type="text" placeholder="Ej. MAGNA-SIRGAS / Colombia Bogot&aacute;">
-          </div>
-          <div class="wide-field">
-            <label for="customProj4">Definici&oacute;n Proj4 opcional</label>
-            <textarea id="customProj4" placeholder="+proj=tmerc +lat_0=4 ... +units=m +no_defs"></textarea>
-            <span class="hint">Si no pegas una definici&oacute;n, se intentar&aacute; cargar autom&aacute;ticamente desde https://epsg.io/{codigo}.js.</span>
-          </div>
-        </div>
-        <div class="actions">
-          <button id="addCrsButton" class="btn btn-primary" type="button">Agregar EPSG</button>
-        </div>
-        <div id="customMessage" class="message">Los EPSG agregados aparecer&aacute;n en los dos selectores.</div>
-      </div>
     </section>
   </main>
 </body>

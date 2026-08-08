@@ -71,7 +71,6 @@ const sourceCrs = document.querySelector("#sourceCrs");
 const targetCrs = document.querySelector("#targetCrs");
 const form = document.querySelector("#converterForm");
 const formMessage = document.querySelector("#formMessage");
-const customMessage = document.querySelector("#customMessage");
 const libraryDot = document.querySelector("#libraryDot");
 const libraryStatus = document.querySelector("#libraryStatus");
 const xInput = document.querySelector("#xInput");
@@ -84,12 +83,6 @@ const pairResult = document.querySelector("#pairResult");
 const crsInfo = document.querySelector("#crsInfo");
 
 let lastResult = null;
-
-function normalizeCode(value) {
-  const clean = String(value || "").trim().toUpperCase().replace(/\s+/g, "");
-  if (!clean) return "";
-  return clean.startsWith("EPSG:") ? clean : `EPSG:${clean.replace(/^EPSG/, "")}`;
-}
 
 function message(element, text, type = "") {
   element.className = `message ${type}`.trim();
@@ -129,7 +122,7 @@ function renderCrsInfo() {
 
 function ensureProj4Ready() {
   if (!window.proj4) {
-    throw new Error("Proj4js no esta disponible. Revisa la conexion a internet o descarga la libreria localmente.");
+    throw new Error("Proj4js no esta disponible. Revisa que el archivo proj4.js este junto a index.html.");
   }
 }
 
@@ -179,60 +172,11 @@ function convert() {
   message(formMessage, `Conversion realizada de ${from} a ${to}.`, "success");
 }
 
-function loadEpsgFromScript(code) {
-  return new Promise((resolve, reject) => {
-    const numericCode = code.replace("EPSG:", "");
-    const script = document.createElement("script");
-    script.src = `https://epsg.io/${numericCode}.js`;
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error(`No se pudo cargar ${code} desde epsg.io.`));
-    document.head.appendChild(script);
-  });
-}
-
-async function addCustomCrs() {
-  try {
-    ensureProj4Ready();
-    const code = normalizeCode(document.querySelector("#customCode").value);
-    const name = document.querySelector("#customName").value.trim() || "Sistema personalizado";
-    const definition = document.querySelector("#customProj4").value.trim();
-    if (!code || !/^EPSG:\d+$/.test(code)) {
-      throw new Error("Ingresa un codigo EPSG numerico valido.");
-    }
-    if (getCrs(code)) {
-      throw new Error(`${code} ya esta en la lista.`);
-    }
-
-    if (definition) {
-      proj4.defs(code, definition);
-    } else {
-      await loadEpsgFromScript(code);
-      if (!proj4.defs(code)) {
-        throw new Error(`epsg.io no entrego una definicion Proj4js para ${code}.`);
-      }
-    }
-
-    crsCatalog.push({
-      code,
-      name,
-      proj4: definition || proj4.defs(code),
-      axis: "X/Y segun la definicion del CRS",
-    });
-    renderCrsOptions();
-    sourceCrs.value = code;
-    renderCrsInfo();
-    message(customMessage, `${code} agregado correctamente.`, "success");
-  } catch (error) {
-    message(customMessage, error.message, "error");
-  }
-}
-
 function initialize() {
   renderCrsOptions();
   if (!window.proj4) {
     libraryStatus.textContent = "Proj4js no cargo";
-    message(formMessage, "No se pudo cargar Proj4js. El HTML requiere internet o una copia local de la libreria.", "error");
+    message(formMessage, "No se pudo cargar Proj4js. Verifica que proj4.js este en la misma carpeta que index.html.", "error");
     return;
   }
   crsCatalog.forEach(addDefinition);
@@ -295,7 +239,6 @@ document.querySelector("#reuseButton").addEventListener("click", () => {
   message(formMessage, "El resultado quedo cargado como nueva coordenada origen.", "success");
 });
 
-document.querySelector("#addCrsButton").addEventListener("click", addCustomCrs);
 sourceCrs.addEventListener("change", renderCrsInfo);
 targetCrs.addEventListener("change", renderCrsInfo);
 window.addEventListener("load", initialize);

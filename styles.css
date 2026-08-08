@@ -31,8 +31,7 @@ body {
 
 button,
 input,
-select,
-textarea {
+select {
   font: inherit;
 }
 
@@ -105,10 +104,6 @@ h1 {
   overflow: hidden;
 }
 
-.custom-panel {
-  margin-top: 18px;
-}
-
 .panel-head {
   padding: 18px 20px 14px;
   border-bottom: 1px solid var(--line);
@@ -137,15 +132,10 @@ h1 {
   gap: 16px;
 }
 
-.field,
-.wide-field {
+.field {
   display: flex;
   flex-direction: column;
   gap: 7px;
-}
-
-.wide-field {
-  grid-column: 1 / -1;
 }
 
 label {
@@ -155,8 +145,7 @@ label {
 }
 
 input,
-select,
-textarea {
+select {
   width: 100%;
   border: 1px solid #cbd3df;
   border-radius: 6px;
@@ -168,23 +157,10 @@ textarea {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-textarea {
-  min-height: 92px;
-  resize: vertical;
-  line-height: 1.45;
-}
-
 input:focus,
-select:focus,
-textarea:focus {
+select:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(8, 127, 140, 0.14);
-}
-
-.hint {
-  color: var(--muted);
-  font-size: 0.82rem;
-  line-height: 1.35;
 }
 
 .actions {
