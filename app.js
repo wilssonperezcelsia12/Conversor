@@ -67,14 +67,46 @@ const crsCatalog = [
   },
 ];
 
-const sourceCrs = document.querySelector("#sourceCrs");
-const targetCrs = document.querySelector("#targetCrs");
-const form = document.querySelector("#converterForm");
-const formMessage = document.querySelector("#formMessage");
-const libraryDot = document.querySelector("#libraryDot");
-const libraryStatus = document.querySelector("#libraryStatus");
-const appVersionEl = document.querySelector('#appVersion');
+// Global state for DOM elements
+let sourceCrs, targetCrs, form, formMessage, libraryDot, libraryStatus, appVersionEl, themeToggleButton;
+let xInput, yInput, zInput, precisionInput, xResult, yResult, pairResult, crsInfo;
+
 const APP_VERSION = 'v1.1';
+
+function getStoredTheme() {
+  try {
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'dark' || storedTheme === 'light') {
+      return storedTheme;
+    }
+  } catch (e) { }
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function applyTheme(theme) {
+  const isDark = theme === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+  if (themeToggleButton) {
+    themeToggleButton.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+    themeToggleButton.setAttribute('aria-pressed', String(isDark));
+  }
+
+  const metaThemeColor = document.querySelector("meta[name='theme-color']");
+  if (metaThemeColor) {
+    metaThemeColor.setAttribute('content', isDark ? '#0f172a' : '#087f8c');
+  }
+
+  try {
+    localStorage.setItem('theme', theme);
+  } catch (e) { }
+}
+
+function handleThemeToggle() {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+  const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  applyTheme(nextTheme);
+}
 
 // Try to read VERSION from sw.js so sw.js remains the single source of truth
 async function fetchVersionFromServiceWorkerFile() {
@@ -89,106 +121,31 @@ async function fetchVersionFromServiceWorkerFile() {
   }
   return null;
 }
-const xInput = document.querySelector("#xInput");
-const yInput = document.querySelector("#yInput");
-const zInput = document.querySelector("#zInput");
-const precisionInput = document.querySelector("#precisionInput");
-const xResult = document.querySelector("#xResult");
-const yResult = document.querySelector("#yResult");
-const pairResult = document.querySelector("#pairResult");
-const crsInfo = document.querySelector("#crsInfo");
-
-let lastResult = null;
-
-function message(element, text, type = "") {
-  element.className = `message ${type}`.trim();
-  element.textContent = text;
-}
-
-function getCrs(code) {
-  return crsCatalog.find((item) => item.code === code);
-}
-
-function addDefinition(item) {
-  if (!window.proj4) return;
-  if (item.proj4) proj4.defs(item.code, item.proj4);
-}
-
-function renderCrsOptions() {
-  const options = crsCatalog
-    .map((item) => `<option value="${item.code}">${item.code} - ${item.name}</option>`)
-    .join("");
-  const currentSource = sourceCrs.value || "EPSG:4326";
-  const currentTarget = targetCrs.value || "EPSG:9377";
-  sourceCrs.innerHTML = options;
-  targetCrs.innerHTML = options;
-  sourceCrs.value = getCrs(currentSource) ? currentSource : "EPSG:4326";
-  targetCrs.value = getCrs(currentTarget) ? currentTarget : "EPSG:9377";
-  renderCrsInfo();
-}
-
-function renderCrsInfo() {
-  const origin = getCrs(sourceCrs.value);
-  const target = getCrs(targetCrs.value);
-  crsInfo.innerHTML = `
-    <div><code>${origin.code}</code> ${origin.axis}</div>
-    <div><code>${target.code}</code> ${target.axis}</div>
-  `;
-}
-
-function ensureProj4Ready() {
-  if (!window.proj4) {
-    throw new Error("Proj4js no esta disponible. Revisa que el archivo proj4.js este junto a index.html.");
-  }
-}
-
-function formatNumber(value, precision) {
-  if (!Number.isFinite(value)) return "-";
-  return Number(value.toFixed(precision)).toLocaleString("en-US", {
-    maximumFractionDigits: precision,
-    useGrouping: false,
-  });
-}
-
-function parseCoordinate(input, label) {
-  const value = Number(input.value);
-  if (!Number.isFinite(value)) {
-    throw new Error(`${label} debe ser un numero valido.`);
-  }
-  return value;
-}
-
-function convert() {
-  ensureProj4Ready();
-  const from = sourceCrs.value;
-  const to = targetCrs.value;
-  const x = parseCoordinate(xInput, "X");
-  const y = parseCoordinate(yInput, "Y");
-  const z = zInput.value.trim() === "" ? null : parseCoordinate(zInput, "Z");
-  const precision = Math.min(12, Math.max(0, Number(precisionInput.value) || 6));
-  const coordinate = z === null ? [x, y] : [x, y, z];
-  const transformed = proj4(from, to, coordinate);
-  const formattedX = formatNumber(transformed[0], precision);
-  const formattedY = formatNumber(transformed[1], precision);
-  const formattedZ = transformed.length > 2 && Number.isFinite(transformed[2])
-    ? formatNumber(transformed[2], precision)
-    : null;
-
-  xResult.textContent = formattedX;
-  yResult.textContent = formattedY;
-  pairResult.textContent = formattedZ ? `${formattedX}, ${formattedY}, ${formattedZ}` : `${formattedX}, ${formattedY}`;
-  lastResult = {
-    from,
-    to,
-    x: transformed[0],
-    y: transformed[1],
-    z: transformed[2],
-    pair: pairResult.textContent,
-  };
-  message(formMessage, `Conversion realizada de ${from} a ${to}.`, "success");
-}
-
 function initialize() {
+  // Capture all elements
+  sourceCrs = document.querySelector("#sourceCrs");
+  targetCrs = document.querySelector("#targetCrs");
+  form = document.querySelector("#converterForm");
+  formMessage = document.querySelector("#formMessage");
+  libraryDot = document.querySelector("#libraryDot");
+  libraryStatus = document.querySelector("#libraryStatus");
+  appVersionEl = document.querySelector('#appVersion');
+  themeToggleButton = document.querySelector('#themeToggleButton');
+  xInput = document.querySelector("#xInput");
+  yInput = document.querySelector("#yInput");
+  zInput = document.querySelector("#zInput");
+  precisionInput = document.querySelector("#precisionInput");
+  xResult = document.querySelector("#xResult");
+  yResult = document.querySelector("#yResult");
+  pairResult = document.querySelector("#pairResult");
+  crsInfo = document.querySelector("#crsInfo");
+
+  // Initialize Theme
+  applyTheme(getStoredTheme());
+  if (themeToggleButton) {
+    themeToggleButton.addEventListener('click', handleThemeToggle);
+  }
+
   renderCrsOptions();
   if (!window.proj4) {
     libraryStatus.textContent = "Proj4js no cargo";
@@ -206,61 +163,75 @@ function initialize() {
   });
 }
 
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
-  try {
-    convert();
-  } catch (error) {
-    message(formMessage, error.message, "error");
+  if (form) {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      try {
+        convert();
+      } catch (error) {
+        message(formMessage, error.message, "error");
+      }
+    });
   }
-});
 
-document.querySelector("#swapButton").addEventListener("click", () => {
-  const currentSource = sourceCrs.value;
-  sourceCrs.value = targetCrs.value;
-  targetCrs.value = currentSource;
-  renderCrsInfo();
-});
-
-document.querySelector("#clearButton").addEventListener("click", () => {
-  form.reset();
-  targetCrs.value = "EPSG:9377";
-  xResult.textContent = "-";
-  yResult.textContent = "-";
-  pairResult.textContent = "-";
-  lastResult = null;
-  renderCrsInfo();
-  message(formMessage, "Formulario limpio.", "");
-});
-
-document.querySelector("#copyButton").addEventListener("click", async () => {
-  if (!lastResult) {
-    message(formMessage, "Primero realiza una conversion.", "error");
-    return;
+  const swapBtn = document.querySelector("#swapButton");
+  if (swapBtn) {
+    swapBtn.addEventListener("click", () => {
+      const currentSource = sourceCrs.value;
+      sourceCrs.value = targetCrs.value;
+      targetCrs.value = currentSource;
+      renderCrsInfo();
+    });
   }
-  try {
-    await navigator.clipboard.writeText(lastResult.pair);
-    message(formMessage, "Resultado copiado al portapapeles.", "success");
-  } catch {
-    message(formMessage, "No se pudo copiar automaticamente. Selecciona el resultado y copialo manualmente.", "error");
-  }
-});
 
-document.querySelector("#reuseButton").addEventListener("click", () => {
-  if (!lastResult) {
-    message(formMessage, "Primero realiza una conversion.", "error");
-    return;
+  const clearBtn = document.querySelector("#clearButton");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      form.reset();
+      targetCrs.value = "EPSG:9377";
+      xResult.textContent = "-";
+      yResult.textContent = "-";
+      pairResult.textContent = "-";
+      lastResult = null;
+      renderCrsInfo();
+      message(formMessage, "Formulario limpio.", "");
+    });
   }
-  xInput.value = lastResult.x;
-  yInput.value = lastResult.y;
-  if (Number.isFinite(lastResult.z)) zInput.value = lastResult.z;
-  sourceCrs.value = lastResult.to;
-  renderCrsInfo();
-  message(formMessage, "El resultado quedo cargado como nueva coordenada origen.", "success");
-});
 
-sourceCrs.addEventListener("change", renderCrsInfo);
-targetCrs.addEventListener("change", renderCrsInfo);
+  const copyBtn = document.querySelector("#copyButton");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", async () => {
+      if (!lastResult) {
+        message(formMessage, "Primero realiza una conversion.", "error");
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(lastResult.pair);
+        message(formMessage, "Resultado copiado al portapapeles.", "success");
+      } catch {
+        message(formMessage, "No se pudo copiar automaticamente. Selecciona el resultado y copialo manualmente.", "error");
+      }
+    });
+  }
+
+  const reuseBtn = document.querySelector("#reuseButton");
+  if (reuseBtn) {
+    reuseBtn.addEventListener("click", () => {
+      if (!lastResult) {
+        message(formMessage, "Primero realiza una conversion.", "error");
+        return;
+      }
+      xInput.value = lastResult.x;
+      yInput.value = lastResult.y;
+      if (Number.isFinite(lastResult.z)) zInput.value = lastResult.z;
+      sourceCrs.value = lastResult.to;
+      renderCrsInfo();
+      message(formMessage, "El resultado quedo cargado como nueva coordenada origen.", "success");
+    });
+  }
+
+  if (sourceCrs) sourceCrs.addEventListener("change", renderCrsInfo);
+  if (targetCrs) targetCrs.addEventListener("change", renderCrsInfo);
 window.addEventListener("load", initialize);
 
 // Register a service worker to enable offline usage (PWA)

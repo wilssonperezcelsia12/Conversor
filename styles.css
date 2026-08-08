@@ -10,9 +10,17 @@
   --button-secondary-bg: #ffffff;
   --button-secondary-border: #cbd3df;
   --button-secondary-hover: #dff5f7;
+  --label: #344054;
+  --metric-bg: #ffffff;
+  --message-bg: #ffffff;
+  --code-bg: #f2f4f7;
+  --code-border: #e4e7ec;
+  --error-bg: #fff4f2;
+  --success-bg: #f0fdf4;
   --accent: #0cba38;
   --accent-strong: #070e73;
   --accent-soft: #dff5f7;
+
   --warn: #a04100;
   --bad: #b42318;
   --good: #027a48;
@@ -32,7 +40,15 @@ html[data-theme='dark'] {
   --button-secondary-bg: #111827;
   --button-secondary-border: #334155;
   --button-secondary-hover: rgba(56, 189, 248, 0.14);
+  --label: #e2e8f0;
+  --metric-bg: #111827;
+  --message-bg: rgba(15, 23, 42, 0.9);
+  --code-bg: rgba(15, 23, 42, 0.8);
+  --code-border: rgba(148, 163, 184, 0.22);
+  --error-bg: rgba(248, 113, 113, 0.12);
+  --success-bg: rgba(74, 222, 128, 0.12);
   --accent: #38bdf8;
+
   --accent-strong: #0ea5e9;
   --accent-soft: rgba(56, 189, 248, 0.12);
   --warn: #fca5a5;
@@ -186,7 +202,7 @@ html[data-theme='dark'] .status-pill {
 }
 
 label {
-  color: #344054;
+  color: var(--label);
   font-size: 0.88rem;
   font-weight: 650;
 }
@@ -265,7 +281,7 @@ select:focus {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 14px;
-  background: #fff;
+  background: var(--metric-bg);
 }
 
 .metric span {
@@ -292,7 +308,7 @@ select:focus {
   padding: 12px 14px;
   border: 1px solid var(--line);
   color: var(--muted);
-  background: #fff;
+  background: var(--message-bg);
   line-height: 1.42;
 }
 
@@ -318,9 +334,9 @@ select:focus {
 }
 
 .crs-list code {
-  color: #344054;
-  background: #f2f4f7;
-  border: 1px solid #e4e7ec;
+  color: var(--ink);
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
   border-radius: 4px;
   padding: 1px 5px;
 }
